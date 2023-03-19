@@ -13,5 +13,5 @@ CodeBERT is a state-of-the-art neural model for code representation learning. It
 ## How to use?
 In our project, we generally seperated our plan into few parts;
 1: Making the trainset 
-    - using elaborately designed prompt to generate specific codes section
-    - data marking (TODO LIST)
+    * using elaborately designed prompt to generate specific codes section
+    * data marking (TODO LIST)
