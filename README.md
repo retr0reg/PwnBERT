@@ -10,8 +10,18 @@ as assistance.
 ### What is CodeBERT
 CodeBERT is a state-of-the-art neural model for code representation learning. It is based on the Transformer architecture and is pre-trained on a large corpus of code. CodeBERT can be fine-tuned on various downstream tasks such as code classification, code retrieval, and code generation. By leveraging the pre-trained model, CodeBERT can effectively capture the semantic and syntactic information of code, which makes it a powerful tool for code analysis and understanding. In PwnBERT, we use CodeBERT to assist in identifying and analyzing Pwn-related vulnerabilities in C language.
 
-## How to use?
+## Plan introduction
 In our project, we generally seperated our plan into few parts;
 * Making the trainset 
     * using elaborately designed prompt to generate specific codes section
     * data marking (TODO LIST)
+
+## How to use?
+### `acquire_trainset`
+In this part, what we basically did is using `OpenAI API` 's `ChatGPT` to generate our prompt, then extract the code in `collect_generated_code(amount_of_time):`. You can test our code by following these steps:
+
+1. `$ touch config.py` This will create a config file that will be use later for the `generate_code_segment.py` file
+
+2. `$ echo "OPEN_AI_KEY = #YOUR_API_KEY"` Change `#YOUR_API_KEY` to your OpenAI API KEY
+
+3. `$ python3 generate_code_segment` This will run the python file.
