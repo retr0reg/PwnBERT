@@ -1,7 +1,7 @@
 import openai
 from tqdm import tqdm
 
-openai.api_key = "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"
+openai.api_key = ""
 
 def get(payload):
     completion = openai.ChatCompletion.create(
@@ -27,7 +27,7 @@ def collect_generated_code(amount_of_time):
         generated_code = respone.choices[0].text
         generated_code = generated_code.replace("code_start", "")
         generated_code = generated_code.replace("code_end", "")
-        code.append(generated_code)
+        codes.append(generated_code)
     return codes
 
     
