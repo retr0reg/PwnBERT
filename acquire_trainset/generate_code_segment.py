@@ -45,7 +45,7 @@ def collect_generated_code(amount_of_time):
             logger.success("Sucess!")
             return codes
         except:
-            logger.error("Some error happend.")
+            logger.error("Some error occured.")
         
 
     
