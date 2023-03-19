@@ -11,3 +11,7 @@ as assistance.
 CodeBERT is a state-of-the-art neural model for code representation learning. It is based on the Transformer architecture and is pre-trained on a large corpus of code. CodeBERT can be fine-tuned on various downstream tasks such as code classification, code retrieval, and code generation. By leveraging the pre-trained model, CodeBERT can effectively capture the semantic and syntactic information of code, which makes it a powerful tool for code analysis and understanding. In PwnBERT, we use CodeBERT to assist in identifying and analyzing Pwn-related vulnerabilities in C language.
 
 ## How to use?
+In our project, we generally seperated our plan into few parts;
+1: Making the trainset 
+    - using elaborately designed prompt to generate specific codes section
+    - data marking (TODO LIST)
