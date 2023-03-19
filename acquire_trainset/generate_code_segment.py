@@ -1,7 +1,8 @@
 import openai
 from tqdm import tqdm
+import config
 
-openai.api_key = ""
+openai.api_key = config.OPEN_AI_KEY
 
 def get(payload):
     completion = openai.ChatCompletion.create(
@@ -33,4 +34,4 @@ def collect_generated_code(amount_of_time):
     
 
 if __name__=="__main__":
-    print(collect_generated_code(10))
+    print(collect_generated_code(1))
