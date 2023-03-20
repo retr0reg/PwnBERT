@@ -1,8 +1,9 @@
-import sys
 import openai
 from tqdm import tqdm
 import config
 from loguru import logger
+import concurrent.futures
+
 
 openai.api_key = config.OPEN_AI_KEY 
 
@@ -14,42 +15,57 @@ def setting():
     # )
     pass
 
-def get(payload,amount):
+def get_async(payload):
     completion = openai.ChatCompletion.create(
-        model = "gpt-3.5-turbo",
-        messages = [
+        model="gpt-3.5-turbo",
+        messages=[
             {
-                "role": "user", 
+                "role": "user",
                 "content": str(payload),
             }
         ],
-        n = int(amount)
     )
-    #print(completion.choices[0].message.content)
     return completion
 
 def collect_generated_code(amount_of_time):
-    prompt = open("./prompt.txt",'r').read()
+    prompt = open("prompt.txt", 'r').read()
     logger.info("Process started")
     codes = []
-    respone = get(prompt,amount_of_time)
-    logger.info("Connection established")
-    for i in tqdm(range(0,amount_of_time)):
-        try:
-            logger.info(f"working on {i}")
-            generated_code = respone.choices[i].message.content
-            generated_code = generated_code.replace("code_start", "")
-            generated_code = generated_code.replace("code_end", "")
-            generated_code = "#include" + generated_code.split("#include")[-1]
-            codes.append(generated_code)
-            logger.success("Sucess!")
-            return codes
-        except:
-            logger.error("Some error occured.")
-        
 
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = [executor.submit(get_async, prompt) for _ in range(amount_of_time)]
+
+        for i, future in enumerate(concurrent.futures.as_completed(futures)):
+            logger.info(f"Working on {i}")
+            try:
+                respone = future.result()
+                generated_code = respone.choices[0].message.content
+                generated_code = generated_code.replace("code_start", "")
+                generated_code = generated_code.replace("code_end", "")
+                generated_code = "#include" + generated_code.split("#include")[-1]
+                codes.append(generated_code)
+                logger.success("Success!")
+            except:
+                logger.error("Some error occurred.")
+
+    return codes
+        
+def write_given_data(data):
+    try:
+        f = open("output.txt",'w+')
+        if type(data) == list:
+            for i in data:
+                f.write(i)
+        else:
+            f.write(data)
+    except:
+        logger.error("Some error occured.")
+        
+    return 1
     
 
 if __name__=="__main__":
+    code_generated_amount = 5
     setting()
-    print(collect_generated_code(2))
+    res = collect_generated_code(code_generated_amount)
+    write_given_data(res)
