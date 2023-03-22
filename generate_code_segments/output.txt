@@ -1,0 +1,169 @@
+#include <stdlib.h>
+
+typedef struct {
+    int id;
+    char name[10];
+    double value;
+} Product;
+
+void off_by_one_vuln(Product* p)
+{
+    for (int i = 0; i <= 10; i++) {
+        p->name[i] = 'A' + i;
+    }
+}
+
+int main()
+{
+    Product* p = (Product*)malloc(sizeof(Product));
+    off_by_one_vuln(p);
+    free(p);
+    return 0;
+}
+
+#include<stdlib.h>
+
+struct buffer{
+    int size;
+    char *data;
+    int flag;
+};
+
+void modify_flag(struct buffer *buf, int index){
+    if(index >= buf->size){
+        printf("Invalid Index!\n");
+        return;
+    }
+    buf->data[index] = 'A';
+    buf->flag = 1;
+}
+
+int main(){
+    struct buffer *buf = (struct buffer*)malloc(sizeof(struct buffer));
+    buf->size = 10;
+    buf->data = (char*)malloc(buf->size);
+    buf->flag = 0;
+
+    for(int i=0; i<=buf->size; i++){ // off-by-one error
+        buf->data[i] = 'a';
+    }
+    modify_flag(buf, 11); // off-by-one error
+
+    if(buf->flag){
+        printf("Modification Successful!\n");
+    }
+    else{
+        printf("Modification Failed!\n");
+    }
+
+    free(buf->data);
+    free(buf);
+    return 0;
+}
+
+code_end#include <stdlib.h>
+
+struct account {
+    int account_number;
+    int balance;
+    char owner[8];
+};
+
+void error_function(struct account* user_account) {
+    printf("\nError! Account number: %d\n", user_account->account_number);
+    printf("Balance: %d\n", user_account->balance);
+    printf("Owner: %s\n", user_account->owner);
+}
+
+int main() {
+    struct account* user_account = (struct account*) malloc(16*sizeof(struct account)); // Allocate 16 * 24 bytes of memory for user accounts
+    int i;
+
+    /* Write data into the buffer, iterating one more time than the buffer size */
+    for (i = 0; i <= 16; i++) {
+        user_account[i].account_number = i + 1;
+        user_account[i].balance = 10000;
+        strcpy(user_account[i].owner, "John Doe");
+    }
+
+    error_function(&user_account[16]); // Calling function with Off-by-One error
+
+    free(user_account); // Free memory
+    return 0;
+}
+
+#include <string.h>
+
+typedef struct user {
+   int id;
+   char name[10];
+   long balance;
+} User;
+
+int transfer(User *sender, User *receiver, long amount) {
+   if (sender->balance < amount) {
+      return -1;
+   }
+   sender->balance -= amount;
+   receiver->balance += amount;
+   return 0;
+}
+
+void setup() {
+   User *users = malloc(2 * sizeof(User));
+   memset(users, 0, 2 * sizeof(User));
+   
+   users[0].id = 1;
+   strncpy(users[0].name, "Alice", sizeof("Alice"));
+   users[0].balance = 100;
+   
+   users[1].id = 2;
+   strncpy(users[1].name, "Bob", sizeof("Bob"));
+   users[1].balance = 10;
+   
+   int index = 3;
+   for (int i=0; i <= index; i++) {
+      User *user = &users[i];
+      printf("User %s has balance %lu\n", user->name, user->balance);
+   }
+}
+
+int main() {
+   setup();
+   return 0;
+}
+code_end#include <stdlib.h>
+
+typedef struct {
+    int data1;
+    int critical_data; // Off-by-One error will affect this field
+    char data2[10];
+} MyStruct;
+
+MyStruct* allocate_struct(int index) {
+    MyStruct* ptr = (MyStruct*)malloc(sizeof(MyStruct) * index);
+    return ptr;
+}
+
+int main() {
+    int size = 5;
+    MyStruct* struct_array = allocate_struct(size);
+
+    for (int i = 0; i <= size; i++) {
+        struct_array[i].data1 = i;
+        struct_array[i].critical_data = 0;
+        sprintf(struct_array[i].data2, "Data %d", i);
+    }
+
+    printf("Struct array created with %d elements:\n", size);
+    for (int i = 0; i < size; i++) {
+        printf("%d: %d, %s\n", i, struct_array[i].data1, struct_array[i].data2);
+    }
+
+    int index = 5; // Off-by-One error occurs here
+    printf("Accessing critical data for index %d...\n", index);
+    printf("Critical data: %d\n", struct_array[index].critical_data); // Off-by-One error will cause this to access invalid memory
+
+    free(struct_array);
+    return 0;
+}

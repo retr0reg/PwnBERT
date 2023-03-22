@@ -28,7 +28,7 @@ def get_async(payload):
     return completion
 
 def collect_generated_code(amount_of_time):
-    prompt = open("prompt.txt", 'r').read()
+    prompt = open("./prompt.txt", 'r').read()
     logger.info("Process started")
     codes = []
 
@@ -41,7 +41,7 @@ def collect_generated_code(amount_of_time):
                 respone = future.result()
                 generated_code = respone.choices[0].message.content
                 generated_code = generated_code.replace("code_start", "")
-                generated_code = generated_code.replace("code_end", "")
+                generated_code = generated_code.replace("code_ends", "")
                 generated_code = "#include" + generated_code.split("#include")[-1]
                 codes.append(generated_code)
                 logger.success("Success!")
@@ -52,7 +52,7 @@ def collect_generated_code(amount_of_time):
         
 def write_given_data(data):
     try:
-        f = open("output.txt",'w+')
+        f = open("./output.txt",'w+')
         if type(data) == list:
             for i in data:
                 f.write(i)
@@ -62,10 +62,11 @@ def write_given_data(data):
         logger.error("Some error occured.")
         
     return 1
-    
 
-if __name__=="__main__":
-    code_generated_amount = 5
+def generate_codes(code_generated_amount):
     setting()
     res = collect_generated_code(code_generated_amount)
-    write_given_data(res)
+    return write_given_data(res)    
+
+if __name__=="__main__":
+    generate_codes(5)
