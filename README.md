@@ -24,7 +24,7 @@ In this part, what we basically did is use `OpenAI API` 's `ChatGPT` to generate
 
 2. `$ echo "OPEN_AI_KEY = #YOUR_API_KEY"` Change `#YOUR_API_KEY` to your OpenAI API KEY
 
-3. `$ python3 generate_code_segment` This will run the python file.
+3. `$ python3 main.py` This will run the python file.
 
 ## Update Logs
 **Mainly updates after Mar 22, 2023:**
