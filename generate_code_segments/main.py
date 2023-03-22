@@ -1,11 +1,14 @@
 import openai
 from tqdm import tqdm
-import config
+from . import config
 from loguru import logger
 import concurrent.futures
+import os
 
 
 openai.api_key = config.OPEN_AI_KEY 
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
 
 def setting():
     # logger.add(
@@ -14,6 +17,9 @@ def setting():
     #     level="INFO"
     # )
     pass
+
+def get_file_location(name):
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), name)
 
 def get_async(payload):
     completion = openai.ChatCompletion.create(
@@ -28,7 +34,7 @@ def get_async(payload):
     return completion
 
 def collect_generated_code(amount_of_time):
-    prompt = open("./prompt.txt", 'r').read()
+    prompt = open(get_file_location("prompt.txt"), 'r').read()
     logger.info("Process started")
     codes = []
 
@@ -41,7 +47,7 @@ def collect_generated_code(amount_of_time):
                 respone = future.result()
                 generated_code = respone.choices[0].message.content
                 generated_code = generated_code.replace("code_start", "")
-                generated_code = generated_code.replace("code_ends", "")
+                generated_code = generated_code.replace("code_end", "")
                 generated_code = "#include" + generated_code.split("#include")[-1]
                 codes.append(generated_code)
                 logger.success("Success!")
@@ -50,23 +56,27 @@ def collect_generated_code(amount_of_time):
 
     return codes
         
-def write_given_data(data):
+def write_given_data(data,internal=False):
     try:
-        f = open("./output.txt",'w+')
-        if type(data) == list:
-            for i in data:
-                f.write(i)
+        if internal:
+            return data
         else:
-            f.write(data)
+            f = open(get_file_location("output.txt"),'w+')
+            if type(data) == list:
+                f.write(str(data))
+                return 1
+            else:
+                f.write(data)
+                return 1
     except:
         logger.error("Some error occured.")
         
     return 1
 
-def generate_codes(code_generated_amount):
+def generate_codes(code_generated_amount,internal):
     setting()
     res = collect_generated_code(code_generated_amount)
-    return write_given_data(res)    
+    return write_given_data(res,internal=internal)    
 
 if __name__=="__main__":
-    generate_codes(5)
+    generate_codes(1)

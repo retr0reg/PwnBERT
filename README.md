@@ -17,7 +17,7 @@ In our project, we generally seperated our plan into few parts;
     * data marking (TODO LIST)
 
 ## How to use?
-### `acquire_trainset/`
+### `generate_code_segments`
 In this part, what we basically did is use `OpenAI API` 's `ChatGPT` to generate our prompt, then extract the code in `collect_generated_code(amount_of_time):`. You can test our code by following these steps:
 
 1. `$ touch config.py` This will create a config file that will be used later for the `generate_code_segment.py` file
@@ -25,3 +25,10 @@ In this part, what we basically did is use `OpenAI API` 's `ChatGPT` to generate
 2. `$ echo "OPEN_AI_KEY = #YOUR_API_KEY"` Change `#YOUR_API_KEY` to your OpenAI API KEY
 
 3. `$ python3 generate_code_segment` This will run the python file.
+
+## Update Logs
+**Mainly updates after Mar 22, 2023:**
+
+* v1.1, Mar 20: Started to use `concurrent.futures` for acceleration purposes.
+
+* v1.2, Mar 22: Created `PwnBERT.py`, major adjust the structure of directories (because I need to import them), fix minor bugs and added new stuff on `generate_code_segments/` and `tokenize_codes`.
