@@ -34,7 +34,7 @@ def get_async(payload):
     return completion
 
 def collect_generated_code(amount_of_time):
-    prompt = open(get_file_location("prompt.txt"), 'r').read()
+    prompt = open(get_file_location("prompt_for_exist.txt"), 'r').read()
     logger.info("Process started")
     codes = []
 
