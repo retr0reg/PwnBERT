@@ -5,15 +5,21 @@ from loguru import logger
 def get_generate_results(amount):
     return gc.generate_codes(amount,True)
     
-def main():
-    """ Still working on this part """
+def generate_tokens(amount):
+    codes_data = gc.generate_codes(amount,internal=True)
     tokenized_token = []
-    res = get_generate_results(5)
-    # logger.info(res)
-    for i in res:
-        tokenized_token.append(tc.encode_tokenizer(str(res)))
+    for i in codes_data[0]:
+        tokenized_token.append(tc.encode_tokenizer(str(i)))
+    gc.write_given_data(tokenized_token,location="vuln/outputs.txt")
+    tokenized_token = []
+    for i in codes_data[1]:
+        tokenized_token.append(tc.encode_tokenizer(str(i)))
+    gc.write_given_data(tokenized_token,location="nvuln/outputs.txt")
     
-    # print(tokenized_token)
+
+
+def main():
+    generate_tokens(2)
     
 if __name__ == "__main__":
     main()

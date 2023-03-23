@@ -34,39 +34,57 @@ def get_async(payload):
     return completion
 
 def collect_generated_code(amount_of_time):
-    prompt = open(get_file_location("prompt_for_exist.txt"), 'r').read()
+    
+    """This generates both vulnerable and non vulnerable code segments"""
+    
+    prompt4exist = open(get_file_location("prompt_for_exist.txt"), 'r').read()
+    prompt4non = open(get_file_location("prompt_for_non_exist.txt"), 'r').read()
     logger.info("Process started")
-    codes = []
+    codes_exist = []
+    codes_non = []
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = [executor.submit(get_async, prompt) for _ in range(amount_of_time)]
+        futures = [executor.submit(get_async, prompt4exist) for _ in range(amount_of_time)]
 
         for i, future in enumerate(concurrent.futures.as_completed(futures)):
-            logger.info(f"Working on {i}")
+            logger.info(f"Working on {i+1}th, for exist sample.")
             try:
                 respone = future.result()
                 generated_code = respone.choices[0].message.content
                 generated_code = generated_code.replace("code_start", "")
                 generated_code = generated_code.replace("code_end", "")
                 generated_code = "#include" + generated_code.split("#include")[-1]
-                codes.append(generated_code)
-                logger.success("Success!")
+                codes_exist.append(generated_code)
+            except:
+                logger.error("Some error occurred.")
+        
+        futures = [executor.submit(get_async, prompt4non) for _ in range(amount_of_time)]
+
+        for i, future in enumerate(concurrent.futures.as_completed(futures)):
+            logger.info(f"Working on {i+1}th, for non exist sample.")
+            try:
+                respone = future.result()
+                generated_code = respone.choices[0].message.content
+                generated_code = generated_code.replace("code_start", "")
+                generated_code = generated_code.replace("code_end", "")
+                generated_code = "#include" + generated_code.split("#include")[-1]
+                codes_non.append(generated_code)
             except:
                 logger.error("Some error occurred.")
 
-    return codes
+    return codes_exist,codes_non
         
-def write_given_data(data,internal=False):
+def write_given_data(datas,location=0,internal=False):
     try:
         if internal:
-            return data
+            return datas
         else:
-            f = open(get_file_location("output.txt"),'w+')
-            if type(data) == list:
-                f.write(str(data))
+            f = open(get_file_location(location),'w+')
+            if type(datas) == list:
+                f.write(str(datas))
                 return 1
             else:
-                f.write(data)
+                f.write(datas)
                 return 1
     except:
         logger.error("Some error occured.")
