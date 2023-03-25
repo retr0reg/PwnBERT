@@ -32,3 +32,5 @@ In this part, what we basically did is use `OpenAI API` 's `ChatGPT` to generate
 * v1.1, Mar 20: Started to use `concurrent.futures` for acceleration purposes.
 
 * v1.2, Mar 22: Created `PwnBERT.py`, major adjust the structure of directories (because I need to import them), fix minor bugs and added new stuff on `generate_code_segments/` and `tokenize_codes`.
+
+* v1.2.1: Fix bugs that might effect significantly on the codes
