@@ -1,3 +1,4 @@
+import time
 import openai
 from tqdm import tqdm
 from . import config
@@ -18,6 +19,9 @@ def setting():
     # )
     pass
 
+def byte_to_kilobyte(b):
+    return '%.1f' % float(b/1000) + 'KB'
+
 def get_file_location(name):
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), name)
 
@@ -33,10 +37,21 @@ def get_async(payload):
     )
     return completion
 
+def process_code(future, codes):
+    time.sleep(0.1)
+    try:
+        respone = future.result()
+        generated_code = respone.choices[0].message.content
+        generated_code = generated_code.replace("code_start", "")
+        generated_code = generated_code.replace("code_end", "")
+        generated_code = "#include" + generated_code.split("#include")[-1]
+        codes.append(generated_code)
+    except Exception as e:
+        logger.error(f"{e}; Retrying")
+        process_code(future, codes)
+
 def collect_generated_code(amount_of_time):
-    
     """This generates both vulnerable and non vulnerable code segments"""
-    
     prompt4exist = open(get_file_location("prompt_for_exist.txt"), 'r').read()
     prompt4non = open(get_file_location("prompt_for_non_exist.txt"), 'r').read()
     logger.info("Process started")
@@ -48,31 +63,15 @@ def collect_generated_code(amount_of_time):
 
         for i, future in enumerate(concurrent.futures.as_completed(futures)):
             logger.info(f"Working on {i+1}th, for exist sample.")
-            try:
-                respone = future.result()
-                generated_code = respone.choices[0].message.content
-                generated_code = generated_code.replace("code_start", "")
-                generated_code = generated_code.replace("code_end", "")
-                generated_code = "#include" + generated_code.split("#include")[-1]
-                codes_exist.append(generated_code)
-            except:
-                logger.error("Some error occurred.")
+            process_code(future, codes_exist)
         
         futures = [executor.submit(get_async, prompt4non) for _ in range(amount_of_time)]
 
         for i, future in enumerate(concurrent.futures.as_completed(futures)):
             logger.info(f"Working on {i+1}th, for non exist sample.")
-            try:
-                respone = future.result()
-                generated_code = respone.choices[0].message.content
-                generated_code = generated_code.replace("code_start", "")
-                generated_code = generated_code.replace("code_end", "")
-                generated_code = "#include" + generated_code.split("#include")[-1]
-                codes_non.append(generated_code)
-            except:
-                logger.error("Some error occurred.")
+            process_code(future, codes_non)
 
-    return codes_exist,codes_non
+    return codes_exist, codes_non
         
 def write_given_data(datas,location=0,internal=False):
     try:
@@ -97,4 +96,5 @@ def generate_codes(code_generated_amount,internal):
     return write_given_data(res,internal=internal)    
 
 if __name__=="__main__":
-    generate_codes(1)
+    # generate_codes(1)
+    pass
