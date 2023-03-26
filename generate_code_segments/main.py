@@ -80,7 +80,7 @@ def write_given_data(datas,location=0,internal=False):
         if internal:
             return datas
         else:
-            f = open(get_file_location(location),'w')
+            f = open(get_file_location(location),'a+')
             if type(datas) == list:
                 f.write(str(datas))
                 return 1
