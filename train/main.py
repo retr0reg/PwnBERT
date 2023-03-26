@@ -34,7 +34,8 @@ class CodeDataset(Dataset):
         label = self.labels[idx]
         tokenized = self.tokenizer(code, return_tensors="pt", padding="max_length", truncation=True, max_length=512)
         tokenized["labels"] = torch.tensor(label, dtype=torch.long)
-        return tokenized
+        return {key: torch.squeeze(val, 0) for key, val in tokenized.items()}
+
 
 def main():
     model_name = "microsoft/codebert-base"
