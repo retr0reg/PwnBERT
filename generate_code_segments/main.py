@@ -38,7 +38,6 @@ def get_async(payload):
     return completion
 
 def process_code(future, codes):
-    time.sleep(0.1)
     try:
         respone = future.result()
         generated_code = respone.choices[0].message.content
@@ -78,7 +77,7 @@ def write_given_data(datas,location=0,internal=False):
         if internal:
             return datas
         else:
-            f = open(get_file_location(location),'w+')
+            f = open(get_file_location(location),'w')
             if type(datas) == list:
                 f.write(str(datas))
                 return 1
