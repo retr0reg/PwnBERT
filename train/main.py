@@ -1,16 +1,17 @@
 import os
 import torch
 import numpy as np
+from sklearn.model_selection import train_test_split
 from torch.utils.data import Dataset, DataLoader
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, TrainingArguments, Trainer
 
 def get_file_location(name):
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), name)
 
-
 class CodeDataset(Dataset):
-    def __init__(self, vuln_path, nvuln_path, tokenizer):
+    def __init__(self, vuln_path, nvuln_path, tokenizer, mode='train', split_ratio=0.8):
         self.tokenizer = tokenizer
+        self.mode = mode
         self.samples = []
         self.labels = []
 
@@ -26,6 +27,14 @@ class CodeDataset(Dataset):
                 self.samples.append(code)
                 self.labels.append(0)  # 没有漏洞的代码标签为0
 
+        samples_train, samples_eval, labels_train, labels_eval = train_test_split(self.samples,self.labels, train_size=split_ratio, random_state=42)
+        if mode == 'train':
+            self.samples = samples_train
+            self.labels = labels_train
+        else:
+            self.samples = samples_eval
+            self.labels = labels_eval
+
     def __len__(self):
         return len(self.samples)
 
@@ -36,6 +45,10 @@ class CodeDataset(Dataset):
         tokenized["labels"] = torch.tensor(label, dtype=torch.long)
         return {key: torch.squeeze(val, 0) for key, val in tokenized.items()}
 
+def compute_metrics(eval_pred):
+    predictions, labels = eval_pred
+    preds = np.argmax(predictions, axis=1)
+    return {"accuracy": (preds == labels).mean()}
 
 def main():
     model_name = "microsoft/codebert-base"
@@ -43,12 +56,13 @@ def main():
     nvuln_path = get_file_location("../generate_code_segments/nvuln")
     epochs = 3
 
-    # 初始化 tokenizer 和模型
+        # 初始化 tokenizer 和模型
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
 
     # 创建数据集
-    dataset = CodeDataset(vuln_path, nvuln_path, tokenizer)
+    train_dataset = CodeDataset(vuln_path, nvuln_path, tokenizer, mode='train')
+    eval_dataset = CodeDataset(vuln_path, nvuln_path, tokenizer, mode='eval')
 
     # 创建训练参数
     training_args = TrainingArguments(
@@ -61,24 +75,20 @@ def main():
         save_strategy="epoch",
         load_best_model_at_end=True,
         metric_for_best_model="accuracy"
-    )
-
-    # 定义评价指标
-    def compute_metrics(eval_pred):
-        predictions, labels = eval_pred
-        preds = np.argmax(predictions, axis=1)
-        return {"accuracy": (preds == labels).mean()}
-
-    # 初始化 Trainer
+        )
+    
     trainer = Trainer(
-        model=model,
-        args=training_args,
-        train_dataset=dataset,
-        compute_metrics=compute_metrics
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=eval_dataset,
+    compute_metrics=compute_metrics
     )
 
     # 开始微调
     trainer.train()
+
+
 
 if __name__ == "__main__":
     main()
