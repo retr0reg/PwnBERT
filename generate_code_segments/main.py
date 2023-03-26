@@ -85,8 +85,8 @@ def write_given_data(datas,location=0,internal=False):
             else:
                 f.write(datas)
                 return 1
-    except:
-        logger.error("Some error occured.")
+    except Exception as e:
+        logger.error(f"ERROR: {e}")
         
     return 1
 
