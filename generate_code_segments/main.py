@@ -5,6 +5,7 @@ from . import config
 from loguru import logger
 import concurrent.futures
 import os
+from tenacity import retry, stop_after_attempt, wait_fixed
 
 
 openai.api_key = config.OPEN_AI_KEY 
@@ -25,6 +26,7 @@ def byte_to_kilobyte(b):
 def get_file_location(name):
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), name)
 
+@retry(stop=stop_after_attempt(5), wait=wait_fixed(3))
 def get_async(payload):
     completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
