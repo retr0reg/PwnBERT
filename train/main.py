@@ -4,6 +4,10 @@ import numpy as np
 from torch.utils.data import Dataset, DataLoader
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, TrainingArguments, Trainer
 
+def get_file_location(name):
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), name)
+
+
 class CodeDataset(Dataset):
     def __init__(self, vuln_path, nvuln_path, tokenizer):
         self.tokenizer = tokenizer
@@ -34,8 +38,8 @@ class CodeDataset(Dataset):
 
 def main():
     model_name = "microsoft/codebert-base"
-    vuln_path = "vuln/"
-    nvuln_path = "nvuln/"
+    vuln_path = get_file_location("../vuln")
+    nvuln_path = get_file_location("../nvuln")
     epochs = 3
 
     # 初始化 tokenizer 和模型
