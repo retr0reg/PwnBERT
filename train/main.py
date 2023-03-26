@@ -38,8 +38,8 @@ class CodeDataset(Dataset):
 
 def main():
     model_name = "microsoft/codebert-base"
-    vuln_path = get_file_location("../vuln")
-    nvuln_path = get_file_location("../nvuln")
+    vuln_path = get_file_location("../generate_code_segments/vuln")
+    nvuln_path = get_file_location("../generate_code_segments/nvuln")
     epochs = 3
 
     # 初始化 tokenizer 和模型
