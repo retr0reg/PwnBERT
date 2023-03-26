@@ -52,6 +52,7 @@ def compute_metrics(eval_pred):
 
 def main():
     model_name = "microsoft/codebert-base"
+    # model_name = "EleutherAI/gpt-neo-1.3B"
     vuln_path = get_file_location("../generate_code_segments/vuln")
     nvuln_path = get_file_location("../generate_code_segments/nvuln")
     epochs = 3
@@ -67,21 +68,25 @@ def main():
     # 创建训练参数
     training_args = TrainingArguments(
         output_dir="output",
-        num_train_epochs=epochs,
-        per_device_train_batch_size=4,
+        num_train_epochs=5,
+        per_device_train_batch_size=8,
+        learning_rate=3e-5,
         logging_dir="logs",
         logging_steps=10,
         evaluation_strategy="epoch",
         save_strategy="epoch",
         load_best_model_at_end=True,
-        metric_for_best_model="accuracy"
+        metric_for_best_model="accuracy",
+        greater_is_better=True,
+        report_to="none"
         )
-    
+
     trainer = Trainer(
     model=model,
     args=training_args,
     train_dataset=train_dataset,
     eval_dataset=eval_dataset,
+    tokenizer=tokenizer,
     compute_metrics=compute_metrics
     )
 
