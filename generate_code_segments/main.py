@@ -63,13 +63,15 @@ def collect_generated_code(amount_of_time):
 
         for i, future in enumerate(concurrent.futures.as_completed(futures)):
             logger.info(f"Working on {i+1}th, for exist sample.")
-            write_given_data(process_code(future),location="vuln/outputs.txt")
+            out = str(process_code(future))
+            write_given_data(out,location="vuln/outputs.txt")
         
         futures = [executor.submit(get_async, prompt4non) for _ in range(amount_of_time)]
 
         for i, future in enumerate(concurrent.futures.as_completed(futures)):
             logger.info(f"Working on {i+1}th, for non exist sample.")
-            write_given_data(process_code(future),location="nvuln/outputs.txt")
+            out = str(process_code(future))
+            write_given_data(out,location="nvuln/outputs.txt")
 
     return codes_exist, codes_non
         
