@@ -23,12 +23,20 @@ class CodeDataset(Dataset):
             file_path = os.path.join(self.nvuln_dir, self.nvuln_files[idx - len(self.vuln_files)])
             label = 0
 
-        with open(file_path,"r", encoding="utf-8") as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             code = f.read()
             inputs = self.tokenizer(code, return_tensors="pt", padding="max_length", truncation=True, max_length=512)
-            inputs["labels"] = torch.tensor([label]).squeeze()
-        
-            return inputs
+            input_ids = inputs["input_ids"].squeeze()
+            attention_mask = inputs["attention_mask"].squeeze()
+            token_type_ids = inputs["token_type_ids"].squeeze()
+
+            return {
+                "input_ids": input_ids,
+                "attention_mask": attention_mask,
+                "token_type_ids": token_type_ids,
+                "labels": torch.tensor(label),
+            }
+
         
         
 def compute_metrics(eval_pred):
