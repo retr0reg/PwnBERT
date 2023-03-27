@@ -46,8 +46,8 @@ class CodeDataset(Dataset):
         return {key: torch.squeeze(val, 0) for key, val in tokenized.items()}
 
 def compute_metrics(eval_pred):
-    predictions, labels = eval_pred
-    preds = np.argmax(predictions, axis=1)
+    logits, labels = eval_pred.predictions, eval_pred.label_ids
+    preds = np.argmax(logits, axis=1)
     return {"accuracy": (preds == labels).mean()}
 
 def main():
