@@ -81,7 +81,7 @@ def collect_generated_code(amount_of_time,both=True):
                 out = str(process_code(future))
                 write_given_data(out,location="eval/vuln/outputs.txt")
                 
-            futures = [executor.submit(get_async, prompt4non) for _ in range(amount_of_time)]
+            futures = [executor.submit(get_async, prompt4non) for _ in range(amount_of_time//4)]
 
             for i, future in enumerate(concurrent.futures.as_completed(futures)):
                 logger.info(f"Working on {i+1}th, for EVAL non exist sample.")
@@ -90,6 +90,9 @@ def collect_generated_code(amount_of_time,both=True):
                 
         else:
             logger.info(f"Only Eval mode")
+            
+            futures = [executor.submit(get_async, prompt4non) for _ in range(amount_of_time)]
+            
             for i, future in enumerate(concurrent.futures.as_completed(futures)):
                 logger.info(f"Working on {i+1}th, for EVAL non exist sample.")
                 out = str(process_code(future))
