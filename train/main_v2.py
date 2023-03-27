@@ -55,7 +55,8 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
 
     training_args = TrainingArguments(
         output_dir=output_dir,
-        num_train_epochs=3,
+        num_train_epochs=5,
+        learning_rate=3e-5,
         per_device_train_batch_size=8,
         logging_steps=50,
         evaluation_strategy="epoch",
