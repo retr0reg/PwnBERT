@@ -48,8 +48,8 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, model_name="bert-base-cased", output_d
         num_train_epochs=3,
         per_device_train_batch_size=8,
         logging_steps=50,
-        save_steps=0,
         evaluation_strategy="epoch",
+        save_strategy="epoch",
         load_best_model_at_end=True,
         metric_for_best_model="accuracy",
         greater_is_better=True,
@@ -65,6 +65,7 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, model_name="bert-base-cased", output_d
     trainer.train()
 
     return model, tokenizer
+
 
 if __name__ == "__main__":
     vuln_dir = "generate_code_segments/vuln"
