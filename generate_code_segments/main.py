@@ -51,7 +51,7 @@ def process_code(future):
         logger.error(f"{e}; Retrying")
         process_code(future)
 
-def collect_generated_code(amount_of_time):
+def collect_generated_code(amount_of_time,both=True):
     """This generates both vulnerable and non vulnerable code segments"""
     prompt4exist = open(get_file_location("prompt_for_exist.txt"), 'r').read()
     prompt4non = open(get_file_location("prompt_for_non_exist.txt"), 'r').read()
@@ -59,19 +59,49 @@ def collect_generated_code(amount_of_time):
     codes_exist = ''
     codes_non = ''
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = [executor.submit(get_async, prompt4exist) for _ in range(amount_of_time)]
+        if both:
+            futures = [executor.submit(get_async, prompt4exist) for _ in range(amount_of_time)]
 
-        for i, future in enumerate(concurrent.futures.as_completed(futures)):
-            logger.info(f"Working on {i+1}th, for exist sample.")
-            out = str(process_code(future))
-            write_given_data(out,location="vuln/outputs.txt")
-        
-        futures = [executor.submit(get_async, prompt4non) for _ in range(amount_of_time)]
+            for i, future in enumerate(concurrent.futures.as_completed(futures)):
+                logger.info(f"Working on {i+1}th, for exist sample.")
+                out = str(process_code(future))
+                write_given_data(out,location="vuln/outputs.txt")
+            
+            futures = [executor.submit(get_async, prompt4non) for _ in range(amount_of_time)]
 
-        for i, future in enumerate(concurrent.futures.as_completed(futures)):
-            logger.info(f"Working on {i+1}th, for non exist sample.")
-            out = str(process_code(future))
-            write_given_data(out,location="nvuln/outputs.txt")
+            for i, future in enumerate(concurrent.futures.as_completed(futures)):
+                logger.info(f"Working on {i+1}th, for non exist sample.")
+                out = str(process_code(future))
+                write_given_data(out,location="nvuln/outputs.txt")
+                
+            futures = [executor.submit(get_async, prompt4non) for _ in range(amount_of_time//4)]
+
+            for i, future in enumerate(concurrent.futures.as_completed(futures)):
+                logger.info(f"Working on {i+1}th, for EVAL non exist sample.")
+                out = str(process_code(future))
+                write_given_data(out,location="eval/vuln/outputs.txt")
+                
+            futures = [executor.submit(get_async, prompt4non) for _ in range(amount_of_time)]
+
+            for i, future in enumerate(concurrent.futures.as_completed(futures)):
+                logger.info(f"Working on {i+1}th, for EVAL non exist sample.")
+                out = str(process_code(future))
+                write_given_data(out,location="eval/nvuln/outputs.txt")
+                
+        else:
+            logger.info(f"Only Eval mode")
+            for i, future in enumerate(concurrent.futures.as_completed(futures)):
+                logger.info(f"Working on {i+1}th, for EVAL non exist sample.")
+                out = str(process_code(future))
+                write_given_data(out,location="eval/vuln/outputs.txt")
+                
+            futures = [executor.submit(get_async, prompt4non) for _ in range(amount_of_time)]
+
+            for i, future in enumerate(concurrent.futures.as_completed(futures)):
+                logger.info(f"Working on {i+1}th, for EVAL non exist sample.")
+                out = str(process_code(future))
+                write_given_data(out,location="eval/nvuln/outputs.txt")
+            
 
     return codes_exist, codes_non
         
@@ -92,9 +122,9 @@ def write_given_data(datas,location=0,internal=False):
         
     return 1
 
-def generate_codes(code_generated_amount,internal):
+def generate_codes(code_generated_amount,internal,both=False):
     setting()
-    res = collect_generated_code(code_generated_amount)
+    res = collect_generated_code(code_generated_amount,both=both)
     return write_given_data(res,internal=internal)    
 
 if __name__=="__main__":
