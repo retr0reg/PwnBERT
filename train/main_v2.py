@@ -30,12 +30,12 @@ class CodeDataset(Dataset):
             inputs = self.tokenizer(code, return_tensors="pt", padding="max_length", truncation=True, max_length=512)
             input_ids = inputs["input_ids"].squeeze()
             attention_mask = inputs["attention_mask"].squeeze()
-            token_type_ids = inputs["token_type_ids"].squeeze()
+            # token_type_ids = inputs["token_type_ids"].squeeze()
 
             return {
                 "input_ids": input_ids,
                 "attention_mask": attention_mask,
-                "token_type_ids": token_type_ids,
+                # "token_type_ids": token_type_ids,
                 "labels": torch.tensor(label),
             }
 
