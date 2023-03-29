@@ -2,7 +2,8 @@ import os
 import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
-from transformers import BertForSequenceClassification, BertTokenizer, Trainer, TrainingArguments
+from transformers import Trainer, TrainingArguments
+from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 from sklearn.model_selection import train_test_split
 
 class CodeDataset(Dataset):
@@ -46,9 +47,15 @@ def compute_metrics(eval_pred):
     accuracy = (preds == labels).mean()
     return {"accuracy": accuracy}
 
-def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_name="bert-base-cased", output_dir="./pwnbert_finetuned"):
-    tokenizer = BertTokenizer.from_pretrained(model_name)
-    model = BertForSequenceClassification.from_pretrained(model_name, num_labels=2)
+def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_name="distilbert-base-cased", output_dir="./pwnbert_finetuned"):
+    
+    tokenizer = DistilBertTokenizer.from_pretrained(model_name)
+
+    model = DistilBertForSequenceClassification.from_pretrained(
+        model_name,
+        num_labels=2,
+        dropout=0.1  # Adjust dropout here
+    )
 
     train_dataset = CodeDataset(vuln_dir, nvuln_dir, tokenizer)
     eval_dataset = CodeDataset(vuln_eval_dir, nvuln_eval_dir, tokenizer)
