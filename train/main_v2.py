@@ -4,6 +4,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from transformers import Trainer, TrainingArguments
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
+from transformers import TrainingArguments, Trainer, DataCollatorWithPadding
 from sklearn.model_selection import train_test_split
 
 class CodeDataset(Dataset):
@@ -61,25 +62,28 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
     eval_dataset = CodeDataset(vuln_eval_dir, nvuln_eval_dir, tokenizer)
 
     training_args = TrainingArguments(
-        output_dir=output_dir,
-        num_train_epochs=5,
-        learning_rate = 1e-5
-        batch_size = 32
-        num_train_epochs = 6
-        logging_steps=50,
-        evaluation_strategy="epoch",
-        save_strategy="epoch",
-        load_best_model_at_end=True,
-        metric_for_best_model="accuracy",
-        greater_is_better=True,
+    output_dir="output",
+    num_train_epochs=6,
+    learning_rate=1e-5,
+    per_device_train_batch_size=32,
+    per_device_eval_batch_size=32,
+    evaluation_strategy="epoch",
+    logging_dir="logs",
+    logging_strategy="epoch",
+    save_strategy="epoch",
+    load_best_model_at_end=True,
     )
 
+    # 使用DataCollatorWithPadding来处理批次的填充
+    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+
+    # 创建训练器
     trainer = Trainer(
         model=model,
         args=training_args,
-        eval_dataset=eval_dataset,
         train_dataset=train_dataset,
-        compute_metrics=compute_metrics,
+        eval_dataset=eval_dataset,
+        data_collator=data_collator,
     )
 
     trainer.train()
