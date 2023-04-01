@@ -57,3 +57,5 @@ The script then defines a compute_metrics function that calculates the accuracy 
 * v1.2, Mar 22: Created `PwnBERT.py`, major adjust the structure of directories (because I need to import them), fix minor bugs and added new stuff on `generate_code_segments/` and `tokenize_codes`.
 
 * v1.2.1: Fix bugs that might effect significantly on the codes
+
+* v1.2.5(idk): Fix Mega bug, i didn't rel

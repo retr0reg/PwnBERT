@@ -20,8 +20,8 @@ def setting():
     # )
     pass
 
-def byte_to_kilobyte(b):
-    return '%.1f' % float(b/1000) + 'KB'
+def byte_to_kilobyte(size):
+    return size / (1024 * 1024 * 1024)
 
 def get_file_location(name):
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), name)
