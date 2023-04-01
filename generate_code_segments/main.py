@@ -123,7 +123,6 @@ def write_given_data(datas,location=0,internal=False):
                 return 1
     except Exception as e:
         logger.error(f"ERROR: {e}")
-        
     return 1
 
 def generate_codes(code_generated_amount,internal,both=False):

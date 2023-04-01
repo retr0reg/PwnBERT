@@ -39,14 +39,13 @@ class CodeDataset(Dataset):
                 # "token_type_ids": token_type_ids,
                 "labels": torch.tensor(label),
             }
-
-        
         
 def compute_metrics(eval_pred):
     predictions, labels = eval_pred
     preds = np.argmax(predictions, axis=1)
     accuracy = (preds == labels).mean()
     return {"accuracy": accuracy}
+
 
 def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_name="distilbert-base-cased", output_dir="./pwnbert_finetuned"):
     
@@ -62,16 +61,16 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
     eval_dataset = CodeDataset(vuln_eval_dir, nvuln_eval_dir, tokenizer)
 
     training_args = TrainingArguments(
-    output_dir="output",
-    num_train_epochs=6,
-    learning_rate=1e-5,
-    per_device_train_batch_size=32,
-    per_device_eval_batch_size=32,
-    evaluation_strategy="epoch",
-    logging_dir="logs",
-    logging_strategy="epoch",
-    save_strategy="epoch",
-    load_best_model_at_end=True,
+        output_dir="output",
+        num_train_epochs=20,
+        learning_rate=3e-5,
+        per_device_train_batch_size=32,
+        per_device_eval_batch_size=32,
+        evaluation_strategy="epoch",
+        logging_dir="logs",
+        logging_strategy="epoch",
+        save_strategy="epoch",
+        load_best_model_at_end=True,
     )
 
     # 使用DataCollatorWithPadding来处理批次的填充
@@ -89,7 +88,6 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
     trainer.train()
 
     return model, tokenizer
-
 
 if __name__ == "__main__":
     vuln_dir = "generate_code_segments/vuln"
