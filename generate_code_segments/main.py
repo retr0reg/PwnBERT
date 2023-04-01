@@ -46,7 +46,7 @@ def process_code(future):
         generated_code = generated_code.replace("code_start", "")
         generated_code = generated_code.replace("code_end", "")
         generated_code = "#include" + generated_code.split("#include")[-1]
-        return generate_codes
+        return generated_code
     except Exception as e:
         logger.error(f"{e}; Retrying")
         process_code(future)
