@@ -7,6 +7,8 @@ from transformers import DistilBertTokenizer, DistilBertForSequenceClassificatio
 from transformers import TrainingArguments, Trainer, DataCollatorWithPadding
 from transformers import SchedulerType
 from sklearn.model_selection import train_test_split
+from transformers import EarlyStoppingCallback
+
 
 class CodeDataset(Dataset):
     def __init__(self, vuln_dir, nvuln_dir, tokenizer):
@@ -75,8 +77,6 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
         # New added
         lr_scheduler_type=SchedulerType.LINEAR,
         weight_decay=0.01,  # Add weight decay
-        early_stopping_patience=3,  # Stop training if eval loss doesn't improve for 3 epochs
-        early_stopping_threshold=0.001,  # Minimum improvement in eval loss to consider
     )
 
     # 使用DataCollatorWithPadding来处理批次的填充
@@ -89,6 +89,7 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         data_collator=data_collator,
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=3, early_stopping_threshold=0.001)],  # Add the callback here
     )
 
     trainer.train()
