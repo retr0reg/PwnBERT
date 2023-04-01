@@ -74,9 +74,6 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
         logging_strategy="epoch",
         save_strategy="epoch",
         load_best_model_at_end=True,
-        # New added
-        lr_scheduler_type=SchedulerType.LINEAR,
-        weight_decay=0.01,  # Add weight decay
     )
 
     # 使用DataCollatorWithPadding来处理批次的填充
