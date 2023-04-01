@@ -9,8 +9,6 @@ from transformers import SchedulerType
 from sklearn.model_selection import train_test_split
 from transformers import EarlyStoppingCallback
 
-from transformers import RobertaTokenizer, RobertaForSequenceClassification
-
 
 class CodeDataset(Dataset):
     def __init__(self, vuln_dir, nvuln_dir, tokenizer):
@@ -52,17 +50,17 @@ def compute_metrics(eval_pred):
     return {"accuracy": accuracy}
 
 
-def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_name="microsoft/codebert-base", output_dir="./pwnbert_finetuned"):
+def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_name="bert-base-cased", output_dir="./pwnbert_finetuned"):
     
-    tokenizer = RobertaTokenizer.from_pretrained(model_name)
-    model = RobertaForSequenceClassification.from_pretrained(
+    tokenizer = BertTokenizer.from_pretrained(model_name)
+
+    model = BertForSequenceClassification.from_pretrained(
         model_name,
         num_labels=2,
     )
 
     train_dataset = CodeDataset(vuln_dir, nvuln_dir, tokenizer)
     eval_dataset = CodeDataset(vuln_eval_dir, nvuln_eval_dir, tokenizer)
-
 
     training_args = TrainingArguments(
         output_dir="output",
@@ -91,6 +89,7 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
     )
 
     trainer.train()
+
     return model, tokenizer
 
 if __name__ == "__main__":
