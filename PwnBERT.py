@@ -1,4 +1,5 @@
 import os
+import sys
 import generate_code_segments.main as gc
 import tokenize_codes.main as tc
 import train.main as trains
@@ -8,7 +9,7 @@ def get_generate_results(amount):
     return gc.generate_codes(amount,True)
     
 def generate_tokens(amount):
-    codes_data = gc.generate_codes(amount,internal=True)
+    codes_data = gc.generate_codes(amount,internal=True,both=True)
     tokenized_token = []
 
     size_v = gc.size_to_human(os.path.getsize("generate_code_segments/vuln/outputs.txt"))
@@ -19,7 +20,7 @@ def generate_tokens(amount):
 
 def train():
     """ All requirements have been set in train/main.py """
-    trains.main() 
+    trains.main(sys.argv[1])
 
 
 def main():
