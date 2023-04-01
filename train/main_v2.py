@@ -10,8 +10,11 @@ from transformers import get_scheduler
 
 class CustomTrainer(Trainer):
     def create_optimizer(self) -> torch.optim.Optimizer:
+        # Replace this with the optimizer of your choice
         optimizer = AdamW(self.model.parameters(), lr=self.args.learning_rate)
+        self.optimizer = optimizer  # Add this line
         return optimizer
+
 
 class CodeDataset(Dataset):
     def __init__(self, vuln_dir, nvuln_dir, tokenizer):
@@ -66,8 +69,6 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
     eval_dataset = CodeDataset(vuln_eval_dir, nvuln_eval_dir, tokenizer)
 
     EPOCHS = 10
- 
-    optimizer = AdamW(model.parameters(), lr=5e-5)
     
 
     training_args = TrainingArguments(
