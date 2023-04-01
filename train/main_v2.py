@@ -5,6 +5,7 @@ from torch.utils.data import Dataset, DataLoader
 from transformers import Trainer, TrainingArguments
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 from transformers import TrainingArguments, Trainer, DataCollatorWithPadding
+from transformers import SchedulerType
 from sklearn.model_selection import train_test_split
 
 class CodeDataset(Dataset):
@@ -54,7 +55,7 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
     model = DistilBertForSequenceClassification.from_pretrained(
         model_name,
         num_labels=2,
-        dropout=0.1  # Adjust dropout here
+        dropout=0.3  # Adjust dropout here
     )
 
     train_dataset = CodeDataset(vuln_dir, nvuln_dir, tokenizer)
@@ -71,6 +72,11 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
         logging_strategy="epoch",
         save_strategy="epoch",
         load_best_model_at_end=True,
+        # New added
+        lr_scheduler_type=SchedulerType.LINEAR,
+        weight_decay=0.01,  # Add weight decay
+        early_stopping_patience=3,  # Stop training if eval loss doesn't improve for 3 epochs
+        early_stopping_threshold=0.001,  # Minimum improvement in eval loss to consider
     )
 
     # 使用DataCollatorWithPadding来处理批次的填充
