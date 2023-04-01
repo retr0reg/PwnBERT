@@ -3,11 +3,13 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
 from transformers import Trainer, TrainingArguments
-from transformers import BertTokenizer, BertForSequenceClassification,RobertaForSequenceClassification
+from transformers import BertTokenizer, BertForSequenceClassification
 from transformers import TrainingArguments, Trainer, DataCollatorWithPadding
 from transformers import SchedulerType
 from sklearn.model_selection import train_test_split
 from transformers import EarlyStoppingCallback
+
+from transformers import RobertaTokenizer, RobertaForSequenceClassification
 
 
 class CodeDataset(Dataset):
@@ -52,6 +54,7 @@ def compute_metrics(eval_pred):
 
 def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_name="microsoft/codebert-base", output_dir="./pwnbert_finetuned"):
     
+    tokenizer = RobertaTokenizer.from_pretrained(model_name)
     model = RobertaForSequenceClassification.from_pretrained(
         model_name,
         num_labels=2,
