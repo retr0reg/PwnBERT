@@ -20,11 +20,11 @@ def generate_tokens(amount):
 
 def train():
     """ All requirements have been set in train/main.py """
-    trains.main(sys.argv[1])
+    trains.main()
 
 
 def main():
-    generate_tokens(20)
+    generate_tokens(sys.argv[1])
     
 if __name__ == "__main__":
     main()
