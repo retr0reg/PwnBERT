@@ -8,6 +8,8 @@ from transformers import TrainingArguments, Trainer, DataCollatorWithPadding
 from transformers import SchedulerType
 from sklearn.model_selection import train_test_split
 from transformers import EarlyStoppingCallback
+from transformers import BertConfig
+
 
 
 class CodeDataset(Dataset):
@@ -54,11 +56,12 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
     
     tokenizer = BertTokenizer.from_pretrained(model_name)
 
-    model = BertForSequenceClassification.from_pretrained(
-        model_name,
-        num_labels=2,
-        dropout=0.3  # Adjust dropout here
-    )
+    config = BertConfig.from_pretrained(model_name, num_labels=2)
+    config.hidden_dropout_prob = 0.3  # Adjust dropout here
+    model = BertForSequenceClassification.from_pretrained(model_name, config=config)
+
+    
+    model.classifier.dropout.p = 0.1  # Adjust dropout here
 
     train_dataset = CodeDataset(vuln_dir, nvuln_dir, tokenizer)
     eval_dataset = CodeDataset(vuln_eval_dir, nvuln_eval_dir, tokenizer)
