@@ -24,7 +24,7 @@ def train():
 
 
 def main():
-    generate_tokens(sys.argv[1])
+    generate_tokens(int(sys.argv[1]))
     
 if __name__ == "__main__":
     main()
