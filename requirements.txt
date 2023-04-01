@@ -4,4 +4,5 @@ torch==2.0.0
 tqdm==4.65.0
 transformers==4.27.2
 tenacity==8.2.2
+humanize==4.6.0
 scikit-learn

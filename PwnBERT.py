@@ -11,8 +11,8 @@ def generate_tokens(amount):
     codes_data = gc.generate_codes(amount,internal=True)
     tokenized_token = []
 
-    size_v = gc.byte_to_kilobyte(os.path.getsize("generate_code_segments/vuln/outputs.txt"))
-    size_nv = gc.byte_to_kilobyte(os.path.getsize("generate_code_segments/nvuln/outputs.txt"))
+    size_v = gc.size_to_human(os.path.getsize("generate_code_segments/vuln/outputs.txt"))
+    size_nv = gc.size_to_human(os.path.getsize("generate_code_segments/nvuln/outputs.txt"))
     logger.success(f"Size of vuln: {size_v}")
     logger.success(f"Size of non-vuln: {size_nv}")
 

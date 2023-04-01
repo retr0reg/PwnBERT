@@ -5,6 +5,7 @@ from . import config
 from loguru import logger
 import concurrent.futures
 import os
+import humanize
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 
@@ -20,8 +21,8 @@ def setting():
     # )
     pass
 
-def byte_to_kilobyte(size):
-    return size / (1024 * 1024 * 1024)
+def size_to_human(size):
+    return humanize.naturalsize(size)
 
 def get_file_location(name):
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), name)
