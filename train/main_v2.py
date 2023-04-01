@@ -6,8 +6,12 @@ from transformers import Trainer, TrainingArguments
 from transformers import BertTokenizer, BertForSequenceClassification
 from transformers import TrainingArguments, Trainer, DataCollatorWithPadding
 from transformers import AdamW
+from transformers import get_scheduler
 
-
+class CustomTrainer(Trainer):
+    def create_optimizer(self) -> torch.optim.Optimizer:
+        optimizer = AdamW(self.model.parameters(), lr=self.args.learning_rate)
+        return optimizer
 
 class CodeDataset(Dataset):
     def __init__(self, vuln_dir, nvuln_dir, tokenizer):
@@ -61,9 +65,14 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
     train_dataset = CodeDataset(vuln_dir, nvuln_dir, tokenizer)
     eval_dataset = CodeDataset(vuln_eval_dir, nvuln_eval_dir, tokenizer)
 
+    EPOCHS = 10
+ 
+    optimizer = AdamW(model.parameters(), lr=5e-5)
+    
+
     training_args = TrainingArguments(
         output_dir="output",
-        num_train_epochs=20,
+        num_train_epochs=EPOCHS,
         learning_rate=3e-5,
         per_device_train_batch_size=32,
         per_device_eval_batch_size=32,
@@ -79,7 +88,8 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
     # 创建训练器
-    trainer = Trainer(
+    
+    trainer = CustomTrainer(
         model=model,
         args=training_args,
         train_dataset=train_dataset,
@@ -87,6 +97,7 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
         data_collator=data_collator,
         # callbacks=[EarlyStoppingCallback(early_stopping_patience=3, early_stopping_threshold=0.001)],  # Add the callback here
     )
+
 
     trainer.train()
 
