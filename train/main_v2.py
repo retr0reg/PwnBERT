@@ -82,6 +82,7 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
         logging_strategy="epoch",
         save_strategy="epoch",
         load_best_model_at_end=True,
+        report_to="tensorboard",
     )
 
     # 使用DataCollatorWithPadding来处理批次的填充
