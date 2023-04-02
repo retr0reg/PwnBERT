@@ -94,17 +94,17 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
     
     #### NEW APPROACH ####
     
-    # EPOCHS = 20
-    # optimizer = AdamW(model.parameters(), lr=2e-5, correct_bias=False)
-    # total_steps = len(train_dataset) * EPOCHS // training_args.per_device_train_batch_size
+    EPOCHS = 20
+    optimizer = AdamW(model.parameters(), lr=2e-5, correct_bias=False)
+    total_steps = len(train_dataset) * EPOCHS // training_args.per_device_train_batch_size
 
-    # scheduler = get_linear_schedule_with_warmup(
-    #     optimizer,
-    #     num_warmup_steps=0,
-    #     num_training_steps=total_steps
-    # )
+    scheduler = get_linear_schedule_with_warmup(
+        optimizer,
+        num_warmup_steps=0,
+        num_training_steps=total_steps
+    )
 
-    # loss_fn = nn.CrossEntropyLoss().to(training_args.device)
+    loss_fn = nn.CrossEntropyLoss().to(training_args.device)
 
     #### END NEW APPROACH ####
 
@@ -118,6 +118,8 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         data_collator=data_collator,
+        optimizers=(optimizer, scheduler),
+        compute_loss=lambda model, inputs, targets: loss_fn(model(**inputs).logits, targets),
         # callbacks=[EarlyStoppingCallback(early_stopping_patience=3, early_stopping_threshold=0.001)],  # Add the callback here
     )
 
