@@ -78,7 +78,7 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
     
     config = AutoConfig.from_pretrained("bert-base-cased", dropout=0.1)
     tokenizer = BertTokenizer.from_pretrained(model_name,config=config)
-    optimizer = AdamW(model.parameters(), lr=5e-5)
+    # optimizer = AdamW(model.parameters(), lr=5e-5)
     
     model = BertForSequenceClassification.from_pretrained(
         model_name,
