@@ -11,6 +11,9 @@ from transformers import AutoConfig
 from transformers.optimization import get_linear_schedule_with_warmup
 from torch import nn
 
+from typing import Optional
+
+
 
 class CustomTrainer(Trainer):
     def create_optimizer(self) -> torch.optim.Optimizer:
