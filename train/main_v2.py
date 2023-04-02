@@ -6,6 +6,7 @@ from transformers import Trainer, TrainingArguments
 from transformers import BertTokenizer, BertForSequenceClassification
 from transformers import TrainingArguments, Trainer, DataCollatorWithPadding
 from transformers import AdamW
+from transformers import AutoConfig
 
 from transformers.optimization import get_linear_schedule_with_warmup
 from torch import nn
@@ -61,7 +62,8 @@ def compute_metrics(eval_pred):
 
 def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_name="bert-base-cased", output_dir="./pwnbert_finetuned"):
     
-    tokenizer = BertTokenizer.from_pretrained(model_name)
+    config = AutoConfig.from_pretrained("bert-base-cased", dropout=0.1)
+    tokenizer = BertTokenizer.from_pretrained(model_name,config=config)
 
     model = BertForSequenceClassification.from_pretrained(
         model_name,
@@ -94,17 +96,17 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
     
     #### NEW APPROACH ####
     
-    # EPOCHS = 20
-    # optimizer = AdamW(model.parameters(), lr=2e-5, correct_bias=False)
-    # total_steps = len(train_dataset) * EPOCHS // training_args.per_device_train_batch_size
+    EPOCHS = 20
+    optimizer = AdamW(model.parameters(), lr=2e-5, correct_bias=False, weight_decay=0.01)
+    total_steps = len(train_dataset) * EPOCHS // training_args.per_device_train_batch_size
 
-    # scheduler = get_linear_schedule_with_warmup(
-    #     optimizer,
-    #     num_warmup_steps=0,
-    #     num_training_steps=total_steps
-    # )
+    scheduler = get_linear_schedule_with_warmup(
+        optimizer,
+        num_warmup_steps=0,
+        num_training_steps=total_steps
+    )
 
-    # loss_fn = nn.CrossEntropyLoss().to(training_args.device)
+    loss_fn = nn.CrossEntropyLoss().to(training_args.device)
 
     #### END NEW APPROACH ####
 
@@ -118,6 +120,7 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         data_collator=data_collator,
+        optimizers=(optimizer, scheduler),
         # callbacks=[EarlyStoppingCallback(early_stopping_patience=3, early_stopping_threshold=0.001)],  # Add the callback here
     )
 
