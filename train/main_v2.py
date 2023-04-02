@@ -17,19 +17,19 @@ from typing import Optional
 
 class CustomTrainer(Trainer):
     def create_optimizer(self) -> torch.optim.Optimizer:
-        # Replace this with the optimizer of your choice
         optimizer = AdamW(self.model.parameters(), lr=self.args.learning_rate)
-        self.optimizer = optimizer  # Add this line
+        self.optimizer = optimizer
         return optimizer
 
     def create_scheduler(self, num_training_steps: int) -> Optional[torch.optim.lr_scheduler._LRScheduler]:
-        # Replace this with the scheduler of your choice
         scheduler = get_linear_schedule_with_warmup(
             self.optimizer,
             num_warmup_steps=0,
-            num_training_steps=num_training_steps
+            num_training_steps=num_training_steps,
         )
+        self.lr_scheduler = scheduler
         return scheduler
+
 
 
 
