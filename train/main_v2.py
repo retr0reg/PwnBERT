@@ -6,7 +6,10 @@ from transformers import Trainer, TrainingArguments
 from transformers import BertTokenizer, BertForSequenceClassification
 from transformers import TrainingArguments, Trainer, DataCollatorWithPadding
 from transformers import AdamW
-from transformers import get_scheduler
+
+from transformers.optimization import get_linear_schedule_with_warmup
+from torch import nn
+
 
 class CustomTrainer(Trainer):
     def create_optimizer(self) -> torch.optim.Optimizer:
@@ -68,7 +71,7 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
     train_dataset = CodeDataset(vuln_dir, nvuln_dir, tokenizer)
     eval_dataset = CodeDataset(vuln_eval_dir, nvuln_eval_dir, tokenizer)
 
-    EPOCHS = 10
+    EPOCHS = 30
     
 
     training_args = TrainingArguments(
@@ -87,6 +90,25 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
 
     # 使用DataCollatorWithPadding来处理批次的填充
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+    
+    
+    #### NEW APPROACH ####
+    
+    # EPOCHS = 20
+    # optimizer = AdamW(model.parameters(), lr=2e-5, correct_bias=False)
+    # total_steps = len(train_dataset) * EPOCHS // training_args.per_device_train_batch_size
+
+    # scheduler = get_linear_schedule_with_warmup(
+    #     optimizer,
+    #     num_warmup_steps=0,
+    #     num_training_steps=total_steps
+    # )
+
+    # loss_fn = nn.CrossEntropyLoss().to(training_args.device)
+
+    #### END NEW APPROACH ####
+
+
 
     # 创建训练器
     
