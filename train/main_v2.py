@@ -15,20 +15,20 @@ from typing import Optional
 
 
 
-class CustomTrainer(Trainer):
-    def create_optimizer(self) -> torch.optim.Optimizer:
-        optimizer = AdamW(self.model.parameters(), lr=self.args.learning_rate)
-        self.optimizer = optimizer
-        return optimizer
+# class CustomTrainer(Trainer):
+#     def create_optimizer(self) -> torch.optim.Optimizer:
+#         optimizer = AdamW(self.model.parameters(), lr=self.args.learning_rate)
+#         self.optimizer = optimizer
+#         return optimizer
 
-    def create_scheduler(self, num_training_steps: int) -> Optional[torch.optim.lr_scheduler._LRScheduler]:
-        scheduler = get_linear_schedule_with_warmup(
-            self.optimizer,
-            num_warmup_steps=0,
-            num_training_steps=num_training_steps,
-        )
-        self.lr_scheduler = scheduler
-        return scheduler
+#     def create_scheduler(self, num_training_steps: int) -> Optional[torch.optim.lr_scheduler._LRScheduler]:
+#         scheduler = get_linear_schedule_with_warmup(
+#             self.optimizer,
+#             num_warmup_steps=0,
+#             num_training_steps=num_training_steps,
+#         )
+#         self.lr_scheduler = scheduler
+#         return scheduler
 
 
 
@@ -127,12 +127,14 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
 
     # 创建训练器
     
-    trainer = CustomTrainer(
+    trainer = Trainer(
         model=model,
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         data_collator=data_collator,
+        optimizers=(optimizer, scheduler),
+        compute_loss=lambda model, inputs, targets: loss_fn(model(**inputs).logits, targets),
         # callbacks=[EarlyStoppingCallback(early_stopping_patience=3, early_stopping_threshold=0.001)],  # Add the callback here
     )
 
