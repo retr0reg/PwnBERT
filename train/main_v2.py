@@ -19,6 +19,16 @@ class CustomTrainer(Trainer):
         self.optimizer = optimizer  # Add this line
         return optimizer
 
+    def create_scheduler(self, num_training_steps: int) -> Optional[torch.optim.lr_scheduler._LRScheduler]:
+        # Replace this with the scheduler of your choice
+        scheduler = get_linear_schedule_with_warmup(
+            self.optimizer,
+            num_warmup_steps=0,
+            num_training_steps=num_training_steps
+        )
+        return scheduler
+
+
 
 class CodeDataset(Dataset):
     def __init__(self, vuln_dir, nvuln_dir, tokenizer):
@@ -120,7 +130,6 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         data_collator=data_collator,
-        optimizers=(optimizer, scheduler),
         # callbacks=[EarlyStoppingCallback(early_stopping_patience=3, early_stopping_threshold=0.001)],  # Add the callback here
     )
 
