@@ -14,7 +14,7 @@ Why you should Pay attention on this project?
 
 
 ## Where are we currently?
-Currently, we have finished our main fine-tuning of our BERT module ( after all we still decided to use DistilBert :sadfaceemoji  ) However, the accuracy is still not ideable. WE ARE STILL WORKING ON THAT NOW
+Currently, we have finished our main fine-tuning of our BERT module, which enable PwnBERT to indentify `Off-by-one` vulns ( after all we still decided to use DistilBert :sadfaceemoji  ) and the accuracy is pretty ideable. Optimization will be done.
 
 ### What is CodeBERT
 CodeBERT is a state-of-the-art neural model for code representation learning. It is based on the Transformer architecture and is pre-trained on a large corpus of code. CodeBERT can be fine-tuned on various downstream tasks such as code classification, code retrieval, and code generation. By leveraging the pre-trained model, CodeBERT can effectively capture the semantic and syntactic information of code, which makes it a powerful tool for code analysis and understanding. In PwnBERT, we use CodeBERT to assist in identifying and analyzing Pwn-related vulnerabilities in C language.
@@ -48,6 +48,14 @@ Generally speaking: This is a Python script for fine-tuning the DistilBert model
 
 The script then defines a compute_metrics function that calculates the accuracy of the model on the evaluation dataset. The main function of the script, finetune_pwnbert, loads the DistilBertForSequenceClassification model from the transformers library, initializes the model with a specified number of output labels, and fine-tunes the model on the training dataset. The function takes as input four directory paths containing the training and evaluation datasets of vulnerable and non-vulnerable code, respectively, and saves the finetuned model and tokenizer in the specified output directory.
 
+## Result
+According to our test result, `PwnBERT` can identify relatively effective, average eval_loss=`MISSING DATA HERE`
+<img width="825" alt="Xnip2023-04-05_10-02-03" src="https://user-images.githubusercontent.com/72267897/229962055-85ae8e41-136c-403c-b542-8c963ace824e.png">
+
+
+However, due to the fact that we are using `BERT`, PwnBERT can only identify `Off-by-one` vuln that looks like the sample from trainset *(not sure if it comprehens it or not)*
+
+
 
 ## Update Logs
 **Mainly updates after Mar 22, 2023:**
@@ -58,4 +66,4 @@ The script then defines a compute_metrics function that calculates the accuracy 
 
 * v1.2.1: Fix bugs that might effect significantly on the codes
 
-* v1.2.5(idk): Fix Mega bug, i didn't rel
+* v1.2.5(idk): Fix Mega bug
