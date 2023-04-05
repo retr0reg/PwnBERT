@@ -76,72 +76,126 @@ def compute_metrics(eval_pred):
 
 def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_name="bert-base-cased", output_dir="./pwnbert_finetuned"):
     
-    config = AutoConfig.from_pretrained("bert-base-cased", dropout=0.1)
-    tokenizer = BertTokenizer.from_pretrained(model_name,config=config)
-    # optimizer = AdamW(model.parameters(), lr=5e-5)
-    
+    tokenizer = BertTokenizer.from_pretrained(model_name)
     model = BertForSequenceClassification.from_pretrained(
         model_name,
         num_labels=2,
     )
-
+    
+    #### add accelerators ###
+    from accelerate import Accelerator
+    from tqdm import tqdm
+    from transformers import AdamW, AutoModelForSequenceClassification, get_scheduler
+    
+    accelerator = Accelerator()
+    
+    
+    
+    # device = torch.device("cuda") if torch.cuda.is_available else torch.device("cpu")
+    device = torch.device("mps")
+    optimizer = AdamW(model.parameters(), lr=5e-5)
+    model.to(device)
+    
+    
     train_dataset = CodeDataset(vuln_dir, nvuln_dir, tokenizer)
     eval_dataset = CodeDataset(vuln_eval_dir, nvuln_eval_dir, tokenizer)
-
-    EPOCHS = 30
     
+    # 创建 DataLoader
+    train_dataloader = DataLoader(train_dataset, batch_size=4, shuffle=True)
+    eval_dataloader = DataLoader(eval_dataset, batch_size=2)
 
-    training_args = TrainingArguments(
-        output_dir="output",
-        num_train_epochs=EPOCHS,
-        learning_rate=3e-5,
-        per_device_train_batch_size=32,
-        per_device_eval_batch_size=32,
-        evaluation_strategy="epoch",
-        logging_dir="logs",
-        logging_strategy="epoch",
-        save_strategy="epoch",
-        load_best_model_at_end=True,
-        report_to="tensorboard",
+    
+    train_dataloader, eval_dataloader, model, optimizer = accelerator.prepare(
+        train_dataloader, eval_dataloader, model, optimizer
+    )
+    
+    num_epochs = 1
+    num_training_steps = num_epochs * len(train_dataloader)
+    lr_scheduler = get_scheduler(
+        "linear",
+        optimizer=optimizer,
+        num_warmup_steps=0,
+        num_training_steps=num_training_steps
     )
 
-    # 使用DataCollatorWithPadding来处理批次的填充
-    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
-    
-    
-    #### NEW APPROACH ####
-    
-    # EPOCHS = 20
-    # optimizer = AdamW(model.parameters(), lr=2e-5, correct_bias=False, weight_decay=0.01)
-    # total_steps = len(train_dataset) * EPOCHS // training_args.per_device_train_batch_size
+    progress_bar = tqdm(range(num_training_steps))
 
-    # scheduler = get_linear_schedule_with_warmup(
-    #     optimizer,
-    #     num_warmup_steps=0,
-    #     num_training_steps=total_steps
+    model.train()
+    for epoch in range(num_epochs):
+        for batch in train_dataloader:
+            batch = {k: v.to(device) for k, v in batch.items()}
+            outputs = model(**batch)
+            loss = outputs.loss
+            loss.backward()
+            print(loss)
+            optimizer.step()
+            lr_scheduler.step()
+            optimizer.zero_grad()
+            progress_bar.update(1)
+    
+    import evaluate
+
+    metric = evaluate.load("accuracy")
+    model.eval()
+    print(batch)
+    for batch in eval_dataloader:
+        batch = {k: v.to(device) for k, v in batch.items()}
+        with torch.no_grad():
+            outputs = model(**batch)
+
+        logits = outputs.logits
+        predictions = torch.argmax(logits, dim=-1)
+        metric.add_batch(predictions=predictions, references=batch["labels"])
+
+    metric.compute()
+    
+    
+    # config = AutoConfig.from_pretrained("bert-base-cased", dropout=0.1)
+    # 
+    # # optimizer = AdamW(model.parameters(), lr=5e-5)
+    
+
+   
+
+    # EPOCHS = 30
+
+    
+
+    # training_args = TrainingArguments(
+    #     output_dir="output",
+    #     num_train_epochs=EPOCHS,
+    #     learning_rate=3e-5,
+    #     per_device_train_batch_size=32,
+    #     per_device_eval_batch_size=32,
+    #     evaluation_strategy="epoch",
+    #     logging_dir="logs",
+    #     logging_strategy="epoch",
+    #     save_strategy="epoch",
+    #     load_best_model_at_end=True,
+    #     report_to="tensorboard",
     # )
 
-    # loss_fn = nn.CrossEntropyLoss().to(training_args.device)
-
-    #### END NEW APPROACH ####
+    # # 使用DataCollatorWithPadding来处理批次的填充
+    # data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
 
 
     # 创建训练器
     
-    trainer = Trainer(
-        model=model,
-        args=training_args,
-        train_dataset=train_dataset,
-        eval_dataset=eval_dataset,
-        data_collator=data_collator,
-        # optimizers=optimizer,
-        # compute_loss=lambda model, inputs, targets: loss_fn(model(**inputs).logits, targets),
-        # callbacks=[EarlyStoppingCallback(early_stopping_patience=3, early_stopping_threshold=0.001)],  # Add the callback here
-    )
+    ### Applying training loops
+    # trainer = Trainer(
+    #     model=model,
+    #     args=training_args,
+    #     train_dataset=train_dataset,
+    #     eval_dataset=eval_dataset,
+    #     data_collator=data_collator,
+    #     # optimizers=optimizer,
+    #     # compute_loss=lambda model, inputs, targets: loss_fn(model(**inputs).logits, targets),
+    #     # callbacks=[EarlyStoppingCallback(early_stopping_patience=3, early_stopping_threshold=0.001)],  # Add the callback here
+    # )
 
 
-    trainer.train()
+    # trainer.train()
 
     return model, tokenizer
 

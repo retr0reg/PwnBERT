@@ -1,1 +1,0 @@
-['#include<string.h>\n\nvoid func(char *buf, int len){\n    printf("Buffer Data: %s\\n", buf);\n    printf("Data Length: %d\\n", len);\n}\n\nint main()\n{\n    char *buf = malloc(10);\n    strcpy(buf,"012345678");\n    func(buf, 10); // function call with incorrect length parameter\n    free(buf);\n    return 0;\n}\n\n']

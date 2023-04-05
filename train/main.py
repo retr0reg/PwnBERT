@@ -63,23 +63,37 @@ def main():
 
     # 创建数据集
     train_dataset = CodeDataset(vuln_path, nvuln_path, tokenizer, mode='train')
-    eval_dataset = CodeDataset(vuln_path, nvuln_path, tokenizer, mode='eval')
+    eval_dataset = CodeDataset(vuln_path, nvuln_path, tokenizer, mode='test')
 
     # 创建训练参数
+    # training_args = TrainingArguments(
+    #     output_dir="output",
+    #     num_train_epochs=5,
+    #     per_device_train_batch_size=8,
+    #     learning_rate=3e-5,
+    #     logging_dir="logs",
+    #     logging_steps=10,
+    #     evaluation_strategy="epoch",
+    #     save_strategy="epoch",
+    #     load_best_model_at_end=True,
+    #     metric_for_best_model="accuracy",
+    #     greater_is_better=True,
+    #     report_to="none"
+    #     )
+    
     training_args = TrainingArguments(
         output_dir="output",
-        num_train_epochs=5,
-        per_device_train_batch_size=8,
+        num_train_epochs=1,
         learning_rate=3e-5,
-        logging_dir="logs",
-        logging_steps=10,
+        per_device_train_batch_size=12,
+        per_device_eval_batch_size=12,
         evaluation_strategy="epoch",
+        logging_dir="logs",
+        logging_strategy="epoch",
         save_strategy="epoch",
         load_best_model_at_end=True,
-        metric_for_best_model="accuracy",
-        greater_is_better=True,
-        report_to="none"
-        )
+        report_to="tensorboard",
+    )
 
     trainer = Trainer(
     model=model,

@@ -9,7 +9,7 @@ def get_generate_results(amount):
     return gc.generate_codes(amount,True)
     
 def generate_tokens(amount):
-    codes_data = gc.generate_codes(amount,internal=True,both=True)
+    codes_data = gc.generate_codes(amount,internal=True,both=False)
     tokenized_token = []
 
     size_v = gc.size_to_human(os.path.getsize("generate_code_segments/vuln/outputs.txt"))

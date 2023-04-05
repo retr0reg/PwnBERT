@@ -1,1 +1,9 @@
 generate_code_segments/config.py
+generate_code_segments/vuln
+generate_code_segments/nvuln
+generate_code_segments/eval
+pwnbert_finetuned/*
+output/*
+logs/*
+generate_code_segments/vuln/outputs.txt
+generate_code_segments/nvuln/outputs.txt
