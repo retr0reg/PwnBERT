@@ -7,3 +7,5 @@ output/*
 logs/*
 generate_code_segments/vuln/outputs.txt
 generate_code_segments/nvuln/outputs.txt
+
+**/__pycache__
