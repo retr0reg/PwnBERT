@@ -3,7 +3,10 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
 from transformers import Trainer, TrainingArguments
-from transformers import BertTokenizer, BertForSequenceClassification
+# from transformers import BertTokenizer, BertForSequenceClassification
+from transformers import RobertaTokenizer, RobertaForSequenceClassification
+
+
 from transformers import TrainingArguments, Trainer, DataCollatorWithPadding
 from transformers import AdamW
 from transformers import AutoConfig
@@ -74,19 +77,22 @@ def compute_metrics(eval_pred):
     return {"accuracy": accuracy}
 
 
-def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_name="bert-base-cased", output_dir="./pwnbert_finetuned"):
+def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_name = "microsoft/codebert-base", output_dir="./pwnbert_finetuned"):
     
-    tokenizer = BertTokenizer.from_pretrained(model_name)
-    model = BertForSequenceClassification.from_pretrained(
+    tokenizer = RobertaTokenizer.from_pretrained(model_name)
+    model = RobertaForSequenceClassification.from_pretrained(
         model_name,
         num_labels=2,
     )
+
     
     #### add accelerators ###
     from accelerate import Accelerator
     from tqdm import tqdm
     from transformers import AdamW, AutoModelForSequenceClassification, get_scheduler
+    from torch.utils.tensorboard import SummaryWriter
     
+    writer = SummaryWriter("logs")
     accelerator = Accelerator()
     
     
@@ -122,7 +128,7 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
 
     model.train()
     for epoch in range(num_epochs):
-        for batch in train_dataloader:
+        for step, batch in enumerate(train_dataloader):
             batch = {k: v.to(device) for k, v in batch.items()}
             outputs = model(**batch)
             loss = outputs.loss
@@ -131,7 +137,12 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
             optimizer.step()
             lr_scheduler.step()
             optimizer.zero_grad()
+            
+            global_step = epoch * len(train_dataloader) + step
+            writer.add_scalar("Loss/train", loss.item(), global_step)
+            
             progress_bar.update(1)
+
     
     import evaluate
 
@@ -148,8 +159,10 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
         metric.add_batch(predictions=predictions, references=batch["labels"])
 
     metric.compute()
+
     
-    
+    writer.add_scalar("Accuracy/eval", metric.result(), epoch)
+
     # config = AutoConfig.from_pretrained("bert-base-cased", dropout=0.1)
     # 
     # # optimizer = AdamW(model.parameters(), lr=5e-5)
@@ -196,7 +209,7 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
 
 
     # trainer.train()
-
+    writer.close()
     return model, tokenizer
 
 if __name__ == "__main__":
