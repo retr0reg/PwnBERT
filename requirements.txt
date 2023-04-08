@@ -1,8 +1,12 @@
-loguru==0.6.0
-openai==0.27.2
-torch==2.0.0
-tqdm==4.65.0
-transformers==4.27.2
-tenacity==8.2.2
+accelerate==0.17.1
+evaluate==0.4.0
 humanize==4.6.0
-scikit-learn
+loguru==0.6.0
+numpy==1.24.2
+openai==0.27.2
+scikit_learn==1.2.2
+tenacity==8.2.2
+# torch==2.1.0.dev20230404
+torch
+tqdm==4.65.0
+transformers==4.27.1
