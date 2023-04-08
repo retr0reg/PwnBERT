@@ -1,12 +1,12 @@
-from transformers import BertForSequenceClassification, BertTokenizer
+from transformers import RobertaTokenizer, RobertaForSequenceClassification
 import torch
 import sys
 import random
 
 # 加载模型和标记器
-model = BertForSequenceClassification.from_pretrained("./pwnbert_finetuned")
-tokenizer = BertTokenizer.from_pretrained("./pwnbert_finetuned")
 
+tokenizer = RobertaTokenizer.from_pretrained("./pwnbert_finetuned")
+model = RobertaForSequenceClassification.from_pretrained("./pwnbert_finetuned")
 # def predict_vulnerability(model, tokenizer, code):
 #     inputs = tokenizer(code, return_tensors="pt", padding="max_length", truncation=True, max_length=512)
 #     outputs = model(**inputs)

@@ -143,25 +143,24 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
             
             progress_bar.update(1)
 
-    
-    import evaluate
+    # try:
+    #     import evaluate
 
-    metric = evaluate.load("accuracy")
-    model.eval()
-    print(batch)
-    for batch in eval_dataloader:
-        batch = {k: v.to(device) for k, v in batch.items()}
-        with torch.no_grad():
-            outputs = model(**batch)
+    #     metric = evaluate.load("accuracy")
+    #     model.eval()
+    #     print(batch)
+    #     for batch in eval_dataloader:
+    #         batch = {k: v.to(device) for k, v in batch.items()}
+    #         with torch.no_grad():
+    #             outputs = model(**batch)
 
-        logits = outputs.logits
-        predictions = torch.argmax(logits, dim=-1)
-        metric.add_batch(predictions=predictions, references=batch["labels"])
-
-    metric.compute()
-
-    
-    writer.add_scalar("Accuracy/eval", metric.result(), epoch)
+    #         logits = outputs.logits
+    #         predictions = torch.argmax(logits, dim=-1)
+    #         metric.add_batch(predictions=predictions, references=batch["labels"])
+    #         writer.add_scalar("Accuracy/eval", metric.compute(), epoch)
+        
+    # except:
+    #     print("No evaluation")
 
     # config = AutoConfig.from_pretrained("bert-base-cased", dropout=0.1)
     # 
@@ -210,13 +209,16 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
 
     # trainer.train()
     writer.close()
-    return model, tokenizer
+    try:
+        model.save_pretrained("pwnbert_finetuned")
+        tokenizer.save_pretrained("pwnbert_finetuned")
+        print("Model and tokenizer saved successfully.")
+    except Exception as e:
+        print("Error occurred while saving the model and tokenizer:", e)
 
 if __name__ == "__main__":
     vuln_dir = "generate_code_segments/vuln"
     nvuln_dir = "generate_code_segments/nvuln"
     vuln_eval_dir = "generate_code_segments/eval/vuln"
     nvuln_eval_dir = "generate_code_segments/eval/nvuln"
-    model, tokenizer = finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir)
-    model.save_pretrained("./pwnbert_finetuned")
-    tokenizer.save_pretrained("./pwnbert_finetuned")
+    finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir)
