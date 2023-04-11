@@ -4,8 +4,7 @@ A project based on BERT to detect GLIBC vulnerabilities.
 
 ## What is PwnBERT
 
-PwnBERT is a BERT-based vulnerability detection tool designed to identify and analyze Pwn-related vulnerabilities (e.g. UAF, heap overflow, etc.) in C language. By combining natural language processing techniques and security domain knowledge, this project aims to provide an efficient and reliable solution to help developers and security researchers identify potential security risks and thus strengthen code security.
-
+PwnBERT is a BERT-based vulnerability detection tool designed to identify and analyze Pwn-related vulnerabilities (e.g. UAF, heap overflow, etc.) in C language. By combining natural language processing techniques and security domain knowledge, this project aims to provide an efficient and reliable solution to help developers and security researchers identify potential security risks and thus strengthen code security. **In future, we will try to apply `PwnBERT` on actual open-source and kernels and see if it can detect vulnerabilities in real-world programs.**
 ### What is PwnBERT (In the way that human can understand)
 
 Generally speaking, PwnBERT is a tool that helps find and analyze vulnerabilities in computer programs written in C language that could be exploited by attackers. It uses a technique called natural language processing and combines it with security expertise to make it easier for developers and security researchers to identify potential security risks and make code more secure. The goal is to create a reliable and efficient solution for identifying and preventing potential security threats.
@@ -76,9 +75,18 @@ According to our test result, `PwnBERT` can identify relatively effective, avera
 
 However, due to the fact that we are using `BERT`, PwnBERT can only identify `Off-by-one` vuln that looks like the sample from trainset *(not sure if it comprehens it or not)*
 
+# Stage two: More diverse and more realistic sample
+## Our idea?
+**In this particular stage, we will generally focus on collecting real and more diverse training samples.** For instance. We will use `CVE` as our main source of data, and we will try to collect as much data as possible. We will also try to collect data from other sources, such as `Github` and `Stackoverflow`.
+
+However, with tons of researchs and tries, we found this abosolutely amazing repo called: `
+juliet-test-suite-c` Which basically saved our life.
+
+Basically, The Juliet Test Suite for C is a comprehensive suite of test cases designed to help developers and researchers identify and evaluate the effectiveness of static analysis and other security-related tools for detecting, diagnosing, and mitigating software vulnerabilities in C programs. Developed by the National Security Agency (NSA) Center for Assured Software (CAS) and the U.S. Department of Homeland Security (DHS), the suite contains over 81,000 test cases covering a wide range of CWEs (Common Weakness Enumerations).
 
 
-## Update Logs
+
+# Update Logs
 **Mainly updates after Mar 22, 2023:**
 
 * v1.1, Mar 20: Started to use `concurrent.futures` for acceleration purposes.

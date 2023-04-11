@@ -142,72 +142,7 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
             writer.add_scalar("Loss/train", loss.item(), global_step)
             
             progress_bar.update(1)
-
-    # try:
-    #     import evaluate
-
-    #     metric = evaluate.load("accuracy")
-    #     model.eval()
-    #     print(batch)
-    #     for batch in eval_dataloader:
-    #         batch = {k: v.to(device) for k, v in batch.items()}
-    #         with torch.no_grad():
-    #             outputs = model(**batch)
-
-    #         logits = outputs.logits
-    #         predictions = torch.argmax(logits, dim=-1)
-    #         metric.add_batch(predictions=predictions, references=batch["labels"])
-    #         writer.add_scalar("Accuracy/eval", metric.compute(), epoch)
-        
-    # except:
-    #     print("No evaluation")
-
-    # config = AutoConfig.from_pretrained("bert-base-cased", dropout=0.1)
-    # 
-    # # optimizer = AdamW(model.parameters(), lr=5e-5)
-    
-
-   
-
-    # EPOCHS = 30
-
-    
-
-    # training_args = TrainingArguments(
-    #     output_dir="output",
-    #     num_train_epochs=EPOCHS,
-    #     learning_rate=3e-5,
-    #     per_device_train_batch_size=32,
-    #     per_device_eval_batch_size=32,
-    #     evaluation_strategy="epoch",
-    #     logging_dir="logs",
-    #     logging_strategy="epoch",
-    #     save_strategy="epoch",
-    #     load_best_model_at_end=True,
-    #     report_to="tensorboard",
-    # )
-
-    # # 使用DataCollatorWithPadding来处理批次的填充
-    # data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
-
-
-
-    # 创建训练器
-    
-    ### Applying training loops
-    # trainer = Trainer(
-    #     model=model,
-    #     args=training_args,
-    #     train_dataset=train_dataset,
-    #     eval_dataset=eval_dataset,
-    #     data_collator=data_collator,
-    #     # optimizers=optimizer,
-    #     # compute_loss=lambda model, inputs, targets: loss_fn(model(**inputs).logits, targets),
-    #     # callbacks=[EarlyStoppingCallback(early_stopping_patience=3, early_stopping_threshold=0.001)],  # Add the callback here
-    # )
-
-
-    # trainer.train()
+            
     writer.close()
     try:
         model.save_pretrained("pwnbert_finetuned")
