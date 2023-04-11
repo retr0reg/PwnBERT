@@ -110,7 +110,7 @@ if __name__ == "__main__":
     nvuln_amount = 0
     input_dir = ""
     for i in range(1,2+1):
-        vuln_amount += process_directory(input_dir=f"testcases/CWE121_Stack_Based_Buffer_Overflow/s0{i}", output_dir="outputs/vuln")
-        nvuln_amount += process_directory(input_dir=f"testcases/CWE121_Stack_Based_Buffer_Overflow/s0{i}", output_dir="outputs/nvuln", nvuln=True)[0]
+        vuln_amount += process_directory(input_dir=f"juliet-test-suite-c/testcases/CWE121_Stack_Based_Buffer_Overflow/s0{i}", output_dir="outputs/vuln")
+        nvuln_amount += process_directory(input_dir=f"juliet-test-suite-c/testcases/CWE121_Stack_Based_Buffer_Overflow/s0{i}", output_dir="outputs/nvuln", nvuln=True)[0]
         
     print(f"Total {vuln_amount} vuln files were processed, {nvuln_amount} non-vuln file were processed; Totally {vuln_amount+nvuln_amount} files were processed")
