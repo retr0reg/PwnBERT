@@ -8,4 +8,6 @@ logs/*
 generate_code_segments/vuln/outputs.txt
 generate_code_segments/nvuln/outputs.txt
 
+get_samples/*
+
 **/__pycache__
