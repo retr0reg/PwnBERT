@@ -8,7 +8,13 @@ import openai
 from tqdm import tqdm
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-openai.api_key = "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"
+current_directory = Path(__file__).resolve().parent
+parent_directory = current_directory.parent
+target_directory = parent_directory / 'generate_code_segments'
+sys.path.append(str(target_directory))
+
+import config
+# Or use api_key directly, method perviouslly used have not been tested
 
 def remove_comments(text):
     text = re.sub(re.compile("/\*.*?\*/", re.DOTALL), "", text)  # Remove /* ... */ comments

@@ -8,6 +8,7 @@ logs/*
 generate_code_segments/vuln/outputs.txt
 generate_code_segments/nvuln/outputs.txt
 
-get_samples/*
+juliet-test-suite-c/*
+outputs/*
 
 **/__pycache__
