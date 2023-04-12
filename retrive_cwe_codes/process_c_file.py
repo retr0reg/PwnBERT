@@ -16,6 +16,8 @@ sys.path.append(str(target_directory))
 import config
 # Or use api_key directly, method perviouslly used have not been tested
 
+openai.api_key = config.OPEN_AI_KEY
+
 def remove_comments(text):
     text = re.sub(re.compile("/\*.*?\*/", re.DOTALL), "", text)  # Remove /* ... */ comments
     text = re.sub(re.compile("//.*?\n"), "", text)  # Remove // comments
@@ -108,6 +110,7 @@ def chat_api(payload):
 def process_nvuln(content):
     prompt = f"I have a vulnerable C code snippet, and I'd like you to generate a similar code snippet that is secure and free of vulnerabilities. Please provide only the code without any comments. Here's the vulnerable code:{content}"
     result = chat_api(prompt)["choices"][0]["message"]["content"]
+    print(result)
     result = "#include" + result.split("#include")[-1]
     return result
 
