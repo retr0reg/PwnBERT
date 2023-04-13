@@ -104,15 +104,15 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
     
     
     train_dataset = CodeDataset(vuln_dir, nvuln_dir, tokenizer)
-    eval_dataset = CodeDataset(vuln_eval_dir, nvuln_eval_dir, tokenizer)
+    # eval_dataset = CodeDataset(vuln_eval_dir, nvuln_eval_dir, tokenizer)
     
     # 创建 DataLoader
     train_dataloader = DataLoader(train_dataset, batch_size=4, shuffle=True)
-    eval_dataloader = DataLoader(eval_dataset, batch_size=2)
+    # eval_dataloader = DataLoader(eval_dataset, batch_size=2)
 
     
-    train_dataloader, eval_dataloader, model, optimizer = accelerator.prepare(
-        train_dataloader, eval_dataloader, model, optimizer
+    train_dataloader, model, optimizer = accelerator.prepare(
+        train_dataloader, model, optimizer
     )
     
     num_epochs = 1
@@ -150,10 +150,20 @@ def finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir, model_n
         print("Model and tokenizer saved successfully.")
     except Exception as e:
         print("Error occurred while saving the model and tokenizer:", e)
-
-if __name__ == "__main__":
+        
+def train_s1():
     vuln_dir = "generate_code_segments/vuln"
     nvuln_dir = "generate_code_segments/nvuln"
     vuln_eval_dir = "generate_code_segments/eval/vuln"
     nvuln_eval_dir = "generate_code_segments/eval/nvuln"
     finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir)
+    
+def train_s2():
+    vuln_dir = "outputs/vuln"
+    nvuln_dir = "outputs/nvuln"
+    vuln_eval_dir = ""
+    nvuln_eval_dir = ""
+    finetune_pwnbert(vuln_dir, nvuln_dir, vuln_eval_dir, nvuln_eval_dir)
+
+if __name__ == "__main__":
+    train_s2()
