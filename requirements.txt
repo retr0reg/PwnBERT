@@ -8,4 +8,4 @@ scikit_learn==1.2.2
 tenacity==8.2.2
 torch
 tqdm==4.65.0
-transformers==4.27.1
+transformers==4.36.0
